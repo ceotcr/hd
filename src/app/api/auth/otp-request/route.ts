@@ -1,0 +1,22 @@
+import { connectDB } from '@/libs/database/db'
+import { Otp } from '@/libs/database/models/Otp'
+import { sendOtpEmail } from '@/libs/helpers/mail'
+import { NextResponse } from 'next/server'
+
+function generateOtp() {
+    return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+export async function POST(req: Request) {
+    const { email } = await req.json()
+    await connectDB()
+
+    const otp = generateOtp()
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
+
+    await Otp.deleteMany({ email }) // clear old
+    await Otp.create({ email, code: otp, expiresAt })
+
+    await sendOtpEmail(email, otp)
+    return NextResponse.json({ success: true })
+}

@@ -3,10 +3,10 @@
 import Logo from "@/components/Logo";
 import Loader from "@/components/ui/Loader";
 import { useSession, signOut } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import NoteForm from "@/components/notes/NoteForm";
 import NotesList from "@/components/notes/NoteList";
+import UnAuthorized from "@/components/UnAuthorized";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -22,15 +22,7 @@ export default function Home() {
 
   if (status === "unauthenticated") {
     return (
-      <main className="w-full h-screen flex flex-col items-center justify-center gap-4">
-        <h1 className="text-2xl">You are not authenticated</h1>
-        <Link
-          href="/auth/signin"
-          className="bg-blue-400 rounded-lg px-4 min-w-40 text-center text-white py-2"
-        >
-          Login
-        </Link>
-      </main>
+      <UnAuthorized />
     );
   }
 

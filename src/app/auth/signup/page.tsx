@@ -55,6 +55,7 @@ export default function SignUpForm() {
             setStep(1);
             resetField("otp");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [email, initialEmail]);
 
     const sendOtp = async () => {

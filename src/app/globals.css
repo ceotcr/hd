@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html {
+    scroll-behavior: smooth;
+    scroll-padding: 3rem;
+}
+
 ::-webkit-scrollbar {
     width: 0.2rem;
 }

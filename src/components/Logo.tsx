@@ -20,4 +20,5 @@ const Logo = React.memo(({ justLogo = false }: { justLogo?: boolean }) => {
     )
 })
 
+Logo.displayName = 'Logo'
 export default Logo

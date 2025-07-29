@@ -1,5 +1,5 @@
 import { NextAuthOptions } from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+import GoogleProvider, { GoogleProfile } from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { connectDB } from "@/libs/database/db"
 import { Otp } from "@/libs/database/models/Otp"
@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
                 try {
                     await connectDB();
 
-                    const googleProfile = profile as any;
+                    const googleProfile = profile as GoogleProfile;
 
                     const existingUser = await User.findOne({ email: googleProfile.email });
 

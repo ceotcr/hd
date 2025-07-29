@@ -32,7 +32,7 @@ const NotesList = () => {
     }
 
     return (
-        <div className="w-[96%] max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-4 gap-2">
+        <div className="w-[96%] pb-4 max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-4 gap-2">
             {notes.map((note) => (
                 <NoteCard key={note._id} id={note._id} content={note.content} />
             ))}

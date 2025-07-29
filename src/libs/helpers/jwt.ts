@@ -1,7 +1,0 @@
-import jwt from 'jsonwebtoken'
-
-export function signJwt(payload: any) {
-    return jwt.sign(payload, process.env.NEXTAUTH_SECRET!, {
-        expiresIn: '7d',
-    })
-}

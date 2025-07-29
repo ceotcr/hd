@@ -59,11 +59,16 @@ const generateHTMLContent = (otp: string) => `
         <h1>Your OTP Code</h1>
         <p>Please use the following OTP to complete your sign-in:</p>
         <p class="otp">${otp}</p>
+        <p>This OTP is valid for 10 minutes.</p>
+        <p>If you did not request this, please ignore this email.</p>
     </div>
 </body>
 </html>
 `
 
 const generateTextContent = (otp: string) => `
-Your OTP is: ${otp}
+Your OTP Code: ${otp}
+Please use the above OTP to complete your sign-in.
+This OTP is valid for 10 minutes.
+If you did not request this, please ignore this email.
 `

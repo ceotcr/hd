@@ -37,19 +37,19 @@ export const authOptions: NextAuthOptions = {
             name: 'OTP Sign Up',
             credentials: {
                 name: { label: 'Name', type: 'text' },
-                birthdate: { label: 'Birthdate', type: 'date' },
+                dob: { label: 'Birthdate', type: 'date' },
                 email: { label: 'Email', type: 'email' },
-                code: { label: 'OTP', type: 'text' },
+                otp: { label: 'OTP', type: 'text' },
             },
             async authorize(credentials) {
                 await connectDB()
                 if (!credentials) throw new Error("Missing credentials")
-                const otp = await Otp.findOne({ email: credentials.email, code: credentials.code })
+                const otp = await Otp.findOne({ email: credentials.email, code: credentials.otp })
                 if (!otp || otp.expiresAt < new Date()) throw new Error('Invalid or expired OTP')
                 await Otp.deleteMany({ email: credentials.email })
                 const user = await User.findOneAndUpdate(
                     { email: credentials.email },
-                    { name: credentials.name, birthdate: credentials.birthdate },
+                    { name: credentials.name, birthdate: credentials.dob },
                     { upsert: true, new: true }
                 )
                 return { id: user._id.toString(), email: user.email }
@@ -60,17 +60,17 @@ export const authOptions: NextAuthOptions = {
             name: 'OTP Sign In',
             credentials: {
                 email: { label: 'Email', type: 'email' },
-                code: { label: 'OTP', type: 'text' }
+                otp: { label: 'OTP', type: 'text' }
             },
             async authorize(credentials) {
                 await connectDB()
                 if (!credentials) throw new Error("Missing credentials")
-                const otp = await Otp.findOne({ email: credentials.email, code: credentials.code })
+                const otp = await Otp.findOne({ email: credentials.email, code: credentials.otp })
                 if (!otp || otp.expiresAt < new Date()) throw new Error('Invalid or expired OTP')
                 await Otp.deleteMany({ email: credentials.email })
                 const user = await User.findOne({ email: credentials.email })
                 if (!user) throw new Error('User not found')
-                return { id: user._id.toString(), email: user.email }
+                return { id: user._id.toString(), email: user.email, name: user.name }
             }
         }),
     ],

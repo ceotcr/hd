@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <ToastContainer />
         </Providers>
       </body>
     </html>

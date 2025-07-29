@@ -9,16 +9,41 @@ import { FormField } from "@/components/ui/FormField";
 import { fullSchema, FormData } from "@/libs/zod/Signup";
 import { signIn } from "next-auth/react";
 import { getOtp } from "@/libs/helpers/getOtp";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function SignUpForm() {
     const [step, setStep] = useState<1 | 2>(1);
     const [initialEmail, setInitialEmail] = useState<string>("");
+    const [otpSent, setOtpSent] = useState<boolean>(false);
+    const [otpTimer, setOtpTimer] = useState<number>(60);
+    const [canResend, setCanResend] = useState<boolean>(false);
+    const router = useRouter();
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (step === 2 && otpSent && otpTimer > 0) {
+            interval = setInterval(() => {
+                setOtpTimer((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        setCanResend(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+
+        return () => clearInterval(interval);
+    }, [step, otpSent, otpTimer]);
 
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors, isSubmitting },
+        resetField
     } = useForm<FormData>({
         resolver: zodResolver(fullSchema),
     });
@@ -28,21 +53,54 @@ export default function SignUpForm() {
     useEffect(() => {
         if (step === 2 && email !== initialEmail) {
             setStep(1);
+            resetField("otp");
         }
-    }, [email, step, initialEmail]);
+    }, [email, initialEmail]);
+
+    const sendOtp = async () => {
+        const response = await getOtp(email);
+        if (response.success) {
+            setOtpSent(true);
+            setOtpTimer(60);
+            setCanResend(false);
+            setStep(2);
+            toast.success("OTP sent to your email");
+            return true;
+        } else {
+            toast.error(response.error ?? "Failed to send OTP. Please try again.")
+            return false;
+        }
+    }
+    const [resending, setResending] = useState<boolean>(false);
+    const handleResendOtp = async () => {
+        setResending(true);
+        if (canResend) {
+            const success = await sendOtp();
+            if (success) {
+                toast.success("OTP has been resent to your email")
+            }
+        }
+        setResending(false);
+    }
 
     const onSubmit = async (data: FormData) => {
         if (step === 1) {
-            const sent = await getOtp(data.email);
-            if (!sent) {
-                alert("Failed to send OTP. Please try again.");
-                return;
+            const success = await sendOtp();
+            if (success) {
+                setInitialEmail(data.email);
             }
-            setStep(2);
-            setInitialEmail(data.email);
         } else {
-            console.log("Final Submitted:", data);
-            alert("Signup successful!");
+            const response = await signIn("otp-signup", {
+                ...data,
+                redirect: false,
+            });
+            if (response?.error) {
+                toast.error(response.error);
+            }
+            else {
+                toast.success("OTP verified successfully!");
+                router.push("/");
+            }
         }
     };
 
@@ -84,16 +142,32 @@ export default function SignUpForm() {
                 </FormField>
 
                 {step === 2 && (
-                    <FormField label="OTP" error={errors.otp?.message}>
-                        <input
-                            {...register("otp")}
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter 6-digit OTP"
-                        />
-                    </FormField>
+                    <>
+                        <FormField label="OTP" error={errors.otp?.message}>
+                            <input
+                                {...register("otp")}
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Enter 6-digit OTP"
+                            />
+                        </FormField>
+                        <div className="text-sm text-gray-500 mt-2 md:text-left">
+                            {canResend ? (
+                                <button
+                                    type="button"
+                                    disabled={resending}
+                                    onClick={handleResendOtp}
+                                    className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer disabled:opacity-50 transition"
+                                >
+                                    {resending ? "Resending..." : "Resend OTP"}
+                                </button>
+                            ) : (
+                                <span>Request OTP again in {otpTimer} seconds</span>
+                            )}
+                        </div>
+                    </>
                 )}
 
                 <div className="mt-8">
@@ -102,13 +176,13 @@ export default function SignUpForm() {
                         type="submit"
                         className="w-full flex justify-center items-center py-3 cursor-pointer px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition"
                     >
-                        {step === 1 ? "Get OTP" : isSubmitting ? "Processing..." : "Sign Up"}
+                        {isSubmitting ? "Processing..." : step === 1 ? "Get OTP" : "Sign Up"}
                     </button>
                 </div>
 
                 <div className="mt-4 text-center text-sm text-gray-600">
                     Already have an account?{" "}
-                    <Link href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                    <Link href="./signin" className="font-medium text-blue-600 hover:text-blue-500">
                         Sign in
                     </Link>
                 </div>
@@ -139,7 +213,6 @@ export default function SignUpForm() {
                     <span className="text-gray-700 font-medium">Continue with Google</span>
                 </button>
             </div>
-
         </div>
     );
 }

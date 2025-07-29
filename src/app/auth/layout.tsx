@@ -5,12 +5,12 @@ import React from 'react'
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className='h-screen grid grid-cols-1 gap-1 md:grid-cols-2'>
-            <div className='grid grid-cols-1 items-center overflow-y-auto gap-4 flex-col justify-center h-screen w-full px-4'>
-                <div className="w-full h-fit mt-4 flex max-md:justify-center">
+            <div className='md:grid md:grid-cols-1 block max-md:space-y-4 items-center overflow-y-auto gap-4 flex-col justify-center h-screen w-full px-4'>
+                <div className="w-full h-fit mt-4 flex max-md:justify-center place-self-start">
                     <Logo />
                 </div>
 
-                <div className='flex w-full flex-col my-auto justify-center pb-4 items-center'>{children}</div>
+                <div className='flex w-full flex-col mb-auto md:my-auto justify-center pb-16 items-center'>{children}</div>
             </div>
             <div className='w-full h-full p-2 hidden md:block'>
                 <Image

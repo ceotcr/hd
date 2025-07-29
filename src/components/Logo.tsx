@@ -7,11 +7,11 @@ const Logo = React.memo(() => {
             <Image
                 src='/assets/logo.png'
                 alt='Logo'
-                width={32}
-                height={32}
+                width={24}
+                height={24}
                 className='rounded-full'
             />
-            <span className='font-bold text-3xl'>HD</span>
+            <span className='font-bold text-2xl'>HD</span>
         </div>
     )
 })

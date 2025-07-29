@@ -8,6 +8,7 @@ import Image from "next/image";
 import { FormField } from "@/components/ui/FormField";
 import { fullSchema, FormData } from "@/libs/zod/Signup";
 import { signIn } from "next-auth/react";
+import { getOtp } from "@/libs/helpers/getOtp";
 
 export default function SignUpForm() {
     const [step, setStep] = useState<1 | 2>(1);
@@ -17,7 +18,7 @@ export default function SignUpForm() {
         register,
         handleSubmit,
         watch,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useForm<FormData>({
         resolver: zodResolver(fullSchema),
     });
@@ -32,6 +33,11 @@ export default function SignUpForm() {
 
     const onSubmit = async (data: FormData) => {
         if (step === 1) {
+            const sent = await getOtp(data.email);
+            if (!sent) {
+                alert("Failed to send OTP. Please try again.");
+                return;
+            }
             setStep(2);
             setInitialEmail(data.email);
         } else {
@@ -42,8 +48,8 @@ export default function SignUpForm() {
 
     return (
         <div className="max-w-sm w-full mx-auto">
-            <h1 className="text-4xl font-bold text-gray-800 mb-1">Sign up</h1>
-            <p className="text-gray-400 mb-8">Sign up to enjoy the feature of HD</p>
+            <h1 className="text-4xl max-md:text-center font-bold text-gray-800 mb-1">Sign up</h1>
+            <p className="text-gray-400 max-md:text-center mb-8">Sign up to enjoy the feature of HD</p>
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <FormField label="Your Name" error={errors.name?.message}>
@@ -92,10 +98,11 @@ export default function SignUpForm() {
 
                 <div className="mt-8">
                     <button
+                        disabled={isSubmitting}
                         type="submit"
-                        className="w-full flex justify-center items-center py-3 cursor-pointer px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="w-full flex justify-center items-center py-3 cursor-pointer px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition"
                     >
-                        {step === 1 ? "Get OTP" : "Sign Up"}
+                        {step === 1 ? "Get OTP" : isSubmitting ? "Processing..." : "Sign Up"}
                     </button>
                 </div>
 

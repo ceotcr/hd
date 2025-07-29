@@ -80,7 +80,6 @@ export const authOptions: NextAuthOptions = {
                 try {
                     await connectDB();
 
-                    // Type assertion for Google profile
                     const googleProfile = profile as any;
 
                     const existingUser = await User.findOne({ email: googleProfile.email });

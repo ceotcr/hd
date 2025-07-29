@@ -20,7 +20,7 @@ export default function SignInForm() {
     const [canResend, setCanResend] = useState<boolean>(false);
     const router = useRouter();
 
-    // Timer countdown effect
+
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
@@ -63,8 +63,8 @@ export default function SignInForm() {
         const response = await getOtp(email, true);
         if (response.success) {
             setOtpSent(true);
-            setOtpTimer(60); // Reset timer to 60 seconds
-            setCanResend(false); // Disable resend button
+            setOtpTimer(60);
+            setCanResend(false);
             setStep(2);
             toast.success("OTP sent to your email");
             return true;
@@ -111,7 +111,7 @@ export default function SignInForm() {
     return (
         <div className="max-w-sm w-full mx-auto">
             <h1 className="text-4xl max-md:text-center font-bold text-gray-800 mb-1">Sign in</h1>
-            <p className="text-gray-400 max-md:text-center mb-8">Sign in to enjoy the features of HD</p>
+            <p className="text-gray-400 max-md:text-center mb-8">Please login to continue to your account.</p>
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <FormField label="Email" error={errors.email?.message}>

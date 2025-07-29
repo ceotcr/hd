@@ -13,15 +13,16 @@ export const DELETE = async (request: NextRequest, { params }: { params: { id: s
                 { status: 401 }
             );
         }
-        const id = session.user.id;
+        const user = session.user.id;
         await connectDB();
-        const note = await Note.findOne({ id: params.id, userId: id });
+        const note = await Note.findOne({ _id: params.id, user });
         if (!note) {
             return NextResponse.json({ error: "Note not found" }, { status: 404 });
         }
-        await Note.deleteOne({ id: params.id, userId: id });
+        await Note.deleteOne({ _id: params.id, user });
         return NextResponse.json({ message: "Note deleted successfully" }, { status: 200 });
     } catch (error) {
+        console.error("Error deleting note:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 };

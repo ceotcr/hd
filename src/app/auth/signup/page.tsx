@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FormField } from "@/components/ui/FormField";
 import { fullSchema, FormData } from "@/libs/zod/Signup";
+import { signIn } from "next-auth/react";
 
 export default function SignUpForm() {
     const [step, setStep] = useState<1 | 2>(1);
@@ -114,7 +115,11 @@ export default function SignUpForm() {
             <div className="">
                 <button
                     type="button"
-                    onClick={() => alert("Google Sign In triggered")}
+                    onClick={() => {
+                        signIn("google", {
+                            callbackUrl: "/",
+                        });
+                    }}
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-gray-300 rounded-md cursor-pointer bg-white hover:bg-gray-50 transition"
                 >
                     <Image

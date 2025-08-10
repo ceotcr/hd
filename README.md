@@ -1,4 +1,4 @@
-# Highwat Delite Note taking app
+# Highway Delite Note taking app
 
 ### Setup Instructions
 - Refer .env.example to create your own .env.local file
